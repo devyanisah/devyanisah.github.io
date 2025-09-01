@@ -136,8 +136,26 @@ body {
 }
 
 .theme-icon {
-    font-size: 1rem;
+    width: 20px;
+    height: 20px;
     transition: all 0.2s ease;
+    color: var(--text-secondary);
+}
+
+.theme-icon .moon-icon {
+    display: block;
+}
+
+.theme-icon .sun-icon {
+    display: none;
+}
+
+[data-theme="dark"] .theme-icon .moon-icon {
+    display: none;
+}
+
+[data-theme="dark"] .theme-icon .sun-icon {
+    display: block;
 }
 
 /* Main Content */
@@ -275,6 +293,18 @@ body::before {
     line-height: 1.3;
 }
 
+.project-meta h3 a {
+    color: inherit;
+    text-decoration: none;
+    transition: color 0.3s ease;
+    border-bottom: 1px solid transparent;
+}
+
+.project-meta h3 a:hover {
+    color: var(--accent-color);
+    border-bottom-color: var(--accent-color);
+}
+
 .project-date {
     font-size: 0.85rem;
     color: var(--accent-color);
@@ -292,6 +322,73 @@ body::before {
 .project-item strong {
     color: var(--accent-color);
     font-weight: 600;
+}
+
+/* Activities Section */
+.activities-section {
+    margin-bottom: 6rem;
+}
+
+.activities-section h2 {
+    font-family: 'Crimson Text', serif;
+    font-size: 2rem;
+    font-weight: 600;
+    margin-bottom: 3rem;
+    color: var(--text-primary);
+}
+
+.activities-list {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+}
+
+.activity-item {
+    padding: 2rem;
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    transition: all 0.3s ease;
+    background: var(--bg-color);
+}
+
+.activity-item:hover {
+    border-color: var(--accent-color);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 30px var(--shadow-hover);
+    background: var(--bg-secondary);
+}
+
+.activity-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 1rem;
+    gap: 1rem;
+}
+
+.activity-header h3 {
+    font-family: 'Crimson Text', serif;
+    font-size: 1.2rem;
+    font-weight: 600;
+    margin: 0;
+    color: var(--text-primary);
+    line-height: 1.3;
+    flex: 1;
+}
+
+.activity-date {
+    font-size: 0.85rem;
+    color: var(--accent-color);
+    font-weight: 500;
+    font-family: 'JetBrains Mono', monospace;
+    white-space: nowrap;
+}
+
+.activity-item p {
+    font-size: 1rem;
+    color: var(--text-secondary);
+    line-height: 1.6;
+    margin: 0;
 }
 
 /* Interests Section */
@@ -483,102 +580,26 @@ body::before {
     box-shadow: 0 4px 12px var(--shadow-hover);
 }
 
-.cert-container {
-    position: relative;
-    padding-bottom: 2rem;
-}
-
-.cert-nav {
-    position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 32px;
-    height: 32px;
-    border-radius: 50%;
-    border: 1px solid var(--border-light);
-    background: var(--bg-secondary);
-    color: var(--text-secondary);
+.cert-grid {
     display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    box-shadow: 0 2px 8px var(--shadow-color);
-    z-index: 10;
-    opacity: 0;
-    backdrop-filter: blur(8px);
-    font-size: 0.9rem;
-}
-
-.cert-container:hover .cert-nav {
-    opacity: 1;
-}
-
-.cert-nav.prev {
-    left: -16px;
-}
-
-.cert-nav.next {
-    right: -16px;
-}
-
-.cert-nav:hover {
-    background: var(--accent-color);
-    color: white;
-    border-color: var(--accent-color);
-    transform: translateY(-50%) scale(1.1);
-    box-shadow: 0 4px 15px var(--shadow-hover);
-}
-
-.cert-nav[disabled] {
-    opacity: 0.2;
-    cursor: not-allowed;
-    pointer-events: none;
-}
-
-.cert-list {
-    display: flex;
+    flex-direction: column;
     gap: 1.5rem;
-    overflow-x: auto;
     padding: 1rem 0;
-    scroll-snap-type: x mandatory;
-    scrollbar-width: none;
-    -ms-overflow-style: none;
-    scroll-behavior: smooth;
 }
 
-.cert-list::-webkit-scrollbar {
-    display: none;
-}
+@media (max-width: 768px) {
+    .cert-grid {
+        gap: 1rem;
+    }
 
-.cert-indicators {
-    display: flex;
-    justify-content: center;
-    gap: 0.5rem;
-    margin-top: 1rem;
-}
-
-.indicator {
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    background: var(--border-color);
-    cursor: pointer;
-    transition: all 0.3s ease;
-}
-
-.indicator.active {
-    background: var(--accent-color);
-    transform: scale(1.2);
-}
-
-.indicator:hover {
-    background: var(--accent-light);
-    transform: scale(1.1);
+    .cert-item {
+        padding: 1.5rem 2rem;
+        min-height: 100px;
+    }
 }
 
 .cert-item {
-    padding: 2rem;
+    padding: 2rem 2.5rem;
     background: var(--bg-color);
     border-radius: 16px;
     border: 1px solid var(--border-color);
@@ -586,9 +607,11 @@ body::before {
     position: relative;
     overflow: hidden;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
-    min-width: clamp(280px, 80vw, 320px);
-    flex-shrink: 0;
-    scroll-snap-align: center;
+    width: 100%;
+    min-height: 120px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
 }
 
 .cert-item::before {
@@ -630,9 +653,10 @@ body::before {
 .cert-header {
     display: flex;
     justify-content: space-between;
-    align-items: flex-start;
+    align-items: center;
     margin-bottom: 1rem;
     gap: 1rem;
+    width: 100%;
 }
 
 .cert-item h4 {
@@ -675,6 +699,13 @@ body::before {
     color: var(--text-secondary);
     line-height: 1.6;
     margin-top: 0.5rem;
+    margin-bottom: 0;
+}
+
+/* Ensure certificates don't stack */
+.cert-item {
+    break-inside: avoid;
+    page-break-inside: avoid;
 }
 
 /* This will be replaced by the enhanced version above */
