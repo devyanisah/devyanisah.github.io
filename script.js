@@ -14,11 +14,34 @@ class MinimalPortfolio {
 
     // Theme Management
     setupTheme() {
-        const savedTheme = localStorage.getItem('theme') || 'light';
-        this.setTheme(savedTheme);
+        const savedTheme = localStorage.getItem('theme');
+        const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+        // If no saved theme, use system preference and track as system-managed
+        if (!savedTheme) {
+            localStorage.setItem('themeMode', 'system');
+            this.setTheme(prefersDark ? 'dark' : 'light');
+        } else {
+            this.setTheme(savedTheme);
+        }
+
+        // Update theme when system preference changes (only if in system mode)
+        const mql = window.matchMedia('(prefers-color-scheme: dark)');
+        const handleSystemChange = (e) => {
+            const mode = localStorage.getItem('themeMode');
+            if (mode === 'system' && !localStorage.getItem('theme')) {
+                this.setTheme(e.matches ? 'dark' : 'light');
+            }
+        };
+        if (mql && mql.addEventListener) {
+            mql.addEventListener('change', handleSystemChange);
+        } else if (mql && mql.addListener) {
+            // Safari fallback
+            mql.addListener(handleSystemChange);
+        }
     }
 
-        setTheme(theme) {
+    setTheme(theme) {
         document.documentElement.setAttribute('data-theme', theme);
         localStorage.setItem('theme', theme);
 
@@ -39,6 +62,8 @@ class MinimalPortfolio {
     toggleTheme() {
         const currentTheme = document.documentElement.getAttribute('data-theme');
         const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+        // Switching manually sets mode to manual and persists theme
+        localStorage.setItem('themeMode', 'manual');
         this.setTheme(newTheme);
     }
 
@@ -81,6 +106,15 @@ class MinimalPortfolio {
     setupScrollEffects() {
         let lastScrollY = window.scrollY;
         const nav = document.querySelector('.nav');
+        const navLinks = Array.from(document.querySelectorAll('.nav-links a'));
+        const sectionsById = new Map();
+        navLinks.forEach(link => {
+            const href = link.getAttribute('href');
+            if (href && href.startsWith('#')) {
+                const el = document.querySelector(href);
+                if (el) sectionsById.set(href.slice(1), { el, link });
+            }
+        });
 
         const handleScroll = () => {
             const currentScrollY = window.scrollY;
@@ -138,6 +172,22 @@ class MinimalPortfolio {
             section.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
             observer.observe(section);
         });
+
+        // Active nav link highlighting
+        const activeObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                const id = entry.target.getAttribute('id');
+                const match = sectionsById.get(id);
+                if (!match) return;
+                if (entry.isIntersecting) {
+                    navLinks.forEach(a => a.classList.remove('active'));
+                    match.link.classList.add('active');
+                }
+            });
+        }, { threshold: 0.4, rootMargin: '-20% 0px -60% 0px' });
+
+        // Observe the main nav sections present in the header nav
+        sectionsById.forEach(({ el }) => activeObserver.observe(el));
 
         // Apply staggered animation to project items
         const projectItems = document.querySelectorAll('.project-item');
